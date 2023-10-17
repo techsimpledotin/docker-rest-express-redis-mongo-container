@@ -1,0 +1,46 @@
+version: "3"
+# Define services here
+services:
+  # Mongo DB Service
+  mongo_db:
+    container_name: mongodb-cont
+    image: mongo:5.0.2
+    restart: always
+    environment:
+      MONGO_DATA_DIR: /data/db
+      MONGO_LOG_DIR: /dev/null
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "2701:27017"
+    networks:
+      - dev-network
+  # Redis Service
+  redis_db:
+    container_name: redis-cont
+    image: redis:latest
+    restart: always
+    ports:
+      - "2702:6379"
+    networks:
+      - dev-network
+    volumes:
+      - cache:/data
+  # Express Service
+  express:
+    build: .
+    ports:
+      - 4000:3000
+    networks:
+      - dev-network
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo_db:27017/tts
+    volumes:
+      - .:/app
+
+volumes:
+  mongo-data:
+  cache:
+networks:
+  dev-network:
